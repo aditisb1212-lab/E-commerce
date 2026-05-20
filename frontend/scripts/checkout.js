@@ -3,21 +3,15 @@ console.log("Checkout page loaded successfully!");
 // =============================
 // LOAD CART
 // =============================
-
+const API_BASE = "http://localhost:5000/api";
 const cart =
     JSON.parse(
         localStorage.getItem("cart")
     ) || [];
 
 if(cart.length === 0){
-
-    alert(
-        "Your cart is empty!"
-    );
-
-    window.location.href =
-        "cart.html";
-
+    showToast("Your cart is empty!", "error");
+    window.location.href = "cart.html";
 }
 
 const checkoutItems =
@@ -154,11 +148,8 @@ checkoutForm.addEventListener(
         e.preventDefault();
 
         if(cart.length === 0){
-
-            alert("Your cart is empty!");
-
+            showToast("Your cart is empty!", "error");
             return;
-
         }
 
         const orders =
@@ -288,12 +279,11 @@ checkoutForm.addEventListener(
             "cart"
         );
 
-        alert(
-            "Order placed successfully!"
-        );
+        showToast("Order placed successfully! 🎉");
 
-        window.location.href =
-            "order.html";
+        // Optional: POST order to backend for logged-in users
+        // fetch(`${API_BASE}/orders`, { method: "POST", body: JSON.stringify(order) });
 
-    }
+        window.location.href = "order.html";
+            }
 );

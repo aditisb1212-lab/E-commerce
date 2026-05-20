@@ -1,35 +1,37 @@
-const express =
-    require("express");
+const express = require("express");
+const router = express.Router();
+const authMiddleware = require("../middleware/authMiddleware");
+const adminMiddleware = require("../middleware/adminMiddleware");
+const orderController = require("../controllers/orderController");
 
-const router =
-    express.Router();
-
-const authMiddleware =
-    require("../middleware/authMiddleware");
-
-// =============================
-// PROTECTED TEST ROUTE
-// =============================
-
-router.get(
-    "/protected",
+// Create new order (protected)
+router.post(
+    "/",
     authMiddleware,
-    (req, res) => {
-
-        res.json({
-
-            success: true,
-
-            message:
-                "Protected route accessed",
-
-            user:
-                req.user
-
-        });
-
-    }
+    orderController.createOrder
 );
 
-module.exports =
-    router;
+// Get all orders (admin protected if needed)
+router.get(
+    "/",
+    authMiddleware,
+    adminMiddleware,
+    orderController.getOrders
+);
+
+// Get single order by ID
+router.get(
+    "/:id",
+    authMiddleware,
+    orderController.getOrderById
+);
+
+// Update order status
+router.put(
+    "/:id/status",
+    authMiddleware,
+    adminMiddleware,
+    orderController.updateOrderStatus
+);
+
+module.exports = router;

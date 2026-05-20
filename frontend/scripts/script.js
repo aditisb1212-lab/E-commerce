@@ -1,13 +1,55 @@
-//////////////////////////////////////////////////////////////////
-// 🛒 ECOMMERCE FULL INTERACTIVE JAVASCRIPT
-// Author: Mohit Yadav
-//////////////////////////////////////////////////////////////////
-
 // =============================
-// GLOBAL STATE
+// API BASE URL & GLOBAL STATE
 // =============================
+const API_BASE = "http://localhost:5000/api";
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 let viewed = JSON.parse(localStorage.getItem("viewed")) || [];
+let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+
+// =============================
+// HELPER: CREATE PRODUCT CARD
+// =============================
+function createProductCard(product) {
+    const card = document.createElement("div");
+    card.classList.add("pro");
+    card.innerHTML = `
+        <img src="${product.image}" alt="${product.name}">
+        <div class="des">
+            <span>${product.brand || "Brand"}</span>
+            <h5>${product.name}</h5>
+            <div class="star">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+            </div>
+            <h4>₹${product.price}</h4>
+        </div>
+        <button class="cart">Add to Cart</button>
+        <span class="wishlist-heart">❤</span>
+    `;
+
+    // Navigate to product page
+    card.addEventListener("click", () => {
+        localStorage.setItem("selectedProduct", JSON.stringify(product));
+        window.location.href = "product.html";
+    });
+
+    // Add to cart button
+    card.querySelector(".cart").addEventListener("click", (e) => {
+        e.stopPropagation();
+        addToCart(product);
+    });
+
+    // Wishlist toggle
+    card.querySelector(".wishlist-heart").addEventListener("click", (e) => {
+        e.stopPropagation();
+        toggleWishlist(product, e.target);
+    });
+
+    return card;
+}
 
 // =============================
 // MOBILE NAVBAR
@@ -16,103 +58,119 @@ const bar = document.getElementById("bar");
 const nav = document.getElementById("navbar");
 
 if (bar) {
-bar.addEventListener("click", () => {
-nav.classList.toggle("active");
-nav.style.right = nav.style.right === "0px" ? "-300px" : "0px";
-});
+    bar.addEventListener("click", () => {
+        nav.classList.toggle("active");
+        nav.style.right = nav.style.right === "0px" ? "-300px" : "0px";
+    });
 }
 
 // =============================
 // STICKY HEADER EFFECT
 // =============================
 window.addEventListener("scroll", () => {
-const header = document.getElementById("header");
-if (window.scrollY > 80) {
-header.style.boxShadow = "0 5px 25px rgba(0,0,0,0.15)";
-} else {
-header.style.boxShadow = "none";
-}
+    const header = document.getElementById("header");
+        if (window.scrollY > 80) {
+            header.style.boxShadow = "0 5px 25px rgba(0,0,0,0.15)";
+        } else {
+        header.style.boxShadow = "none";
+    }
 });
 
 // =============================
 // TOAST MESSAGE
 // =============================
 function showToast(msg) {
-const toast = document.createElement("div");
-toast.innerText = msg;
-toast.style.cssText = `     position:fixed;
-    bottom:20px;
-    right:20px;
-    background:#088178;
-    color:#fff;
-    padding:12px 18px;
-    border-radius:6px;
-    font-size:14px;
-    z-index:9999;
-    opacity:0;
-    transition:0.4s;
-  `;
-document.body.appendChild(toast);
-setTimeout(() => (toast.style.opacity = "1"), 100);
-setTimeout(() => {
-toast.style.opacity = "0";
-setTimeout(() => toast.remove(), 400);
-}, 2000);
+    const toast = document.createElement("div");
+    toast.innerText = msg;
+    toast.style.cssText = `     position:fixed;
+        bottom:20px;
+        right:20px;
+        background:#088178;
+        color:#fff;
+        padding:12px 18px;
+        border-radius:6px;
+        font-size:14px;
+        z-index:9999;
+        opacity:0;
+        transition:0.4s;
+    `;
+    document.body.appendChild(toast);
+    setTimeout(() => (toast.style.opacity = "1"), 100);
+    setTimeout(() => {
+        toast.style.opacity = "0";
+        setTimeout(() => toast.remove(), 400);
+    }, 2000);
 }
 
 // =============================
 // ADD TO CART
 // =============================
-document.querySelectorAll(".cart").forEach((btn, index) => {
-btn.addEventListener("click", (e) => {
-e.preventDefault();
+function addToCart(product) {
+    const item = {
+        name: product.name,
+        price: product.price,
+        img: product.image,
+        qty: 1
+    };
 
-```
-const product = btn.closest(".pro");
-const name = product.querySelector("h5").innerText;
-const price = product.querySelector("h4").innerText;
-const img = product.querySelector("img").src;
+    const existing = cart.find(p => p.name === product.name);
+    if (existing) existing.qty++;
+    else cart.push(item);
 
-const item = { name, price, img, qty: 1 };
+    localStorage.setItem("cart", JSON.stringify(cart));
+    updateCartCount();
+    showToast("Added to Cart 🛍️");
 
-const existing = cart.find((p) => p.name === name);
+    // Optional: POST to backend for logged-in users
+    // fetch(`${API_BASE}/cart/add`, { method: "POST", body: JSON.stringify(item) });
+}
 
-if (existing) existing.qty++;
-else cart.push(item);
+// =============================
+// WISHLIST TOGGLE
+// =============================
+function toggleWishlist(product, heartEl) {
+    if (wishlist.find(p => p.name === product.name)) {
+        wishlist = wishlist.filter(p => p.name !== product.name);
+        heartEl.style.color = "white";
+        showToast("Removed from Wishlist ❌");
+    } else {
+        wishlist.push(product);
+        heartEl.style.color = "red";
+        showToast("Added to Wishlist ❤️");
+    }
 
-localStorage.setItem("cart", JSON.stringify(cart));
-updateCartCount();
-showToast("Added to Cart 🛍️");
-```
+    localStorage.setItem("wishlist", JSON.stringify(wishlist));
 
-});
-});
+    // Optional: POST to backend for logged-in users
+    // fetch(`${API_BASE}/wishlist/toggle`, { method: "POST", body: JSON.stringify(product) });
+}
 
 // =============================
 // CART COUNT BADGE
 // =============================
 function updateCartCount() {
-let total = cart.reduce((sum, item) => sum + item.qty, 0);
+    let total = cart.reduce((sum, item) => sum + item.qty, 0);
 
-let badge = document.getElementById("cart-count");
-if (!badge) {
-badge = document.createElement("span");
-badge.id = "cart-count";
-badge.style.cssText = `       position:absolute;
-      top:-8px;
-      right:-10px;
-      background:red;
-      color:white;
-      font-size:12px;
-      padding:2px 6px;
-      border-radius:50%;
-    `;
-const cartIcon = document.querySelector(".fa-shopping-bag")?.parentElement;
-if (cartIcon) cartIcon.appendChild(badge);
+    let badge = document.getElementById("cart-count");
+    if (!badge) {
+        badge = document.createElement("span");
+        badge.id = "cart-count";
+        badge.style.cssText = `       position:absolute;
+            top:-8px;
+            right:-10px;
+            background:red;
+            color:white;
+            font-size:12px;
+            padding:2px 6px;
+            border-radius:50%;
+        `;
+        const cartIcon = document.querySelector(".fa-shopping-bag")?.parentElement;
+        if (cartIcon) cartIcon.appendChild(badge);
+    }   
+
+    badge.innerText = total;
 }
 
-badge.innerText = total;
-}
 updateCartCount();
 
 // =============================
@@ -903,13 +961,28 @@ if(recentlyViewedContainer){
 }
 
 // =============================
-// FEATURED PRODUCTS
+// FEATURED PRODUCTS (Backend Integration)
 // =============================
+const featuredProductsContainer = document.getElementById("featured-products");
 
-const featuredContainer =
-    document.getElementById(
-        "featured-products-container"
-    );
+async function renderFeaturedProducts() {
+    try {
+        const response = await fetch(`${API_BASE}/products?featured=true`);
+        const data = await response.json();
+        if (!data.success) throw new Error("Failed to fetch featured products");
+
+        featuredProductsContainer.innerHTML = "";
+
+        data.products.forEach(product => {
+            const card = createProductCard(product);
+            featuredProductsContainer.appendChild(card);
+        });
+
+    } catch (error) {
+        console.error("Error loading featured products:", error);
+        featuredProductsContainer.innerHTML = "<p>Unable to load featured products.</p>";
+    }
+}
 
 if(featuredContainer){
 

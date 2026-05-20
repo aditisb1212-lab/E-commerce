@@ -1,92 +1,38 @@
 console.log("Product page loaded successfully!");
 
 // =============================
-// LOAD PRODUCT
+// API BASE URL & GLOBAL STATE
 // =============================
-
-const product =
-    JSON.parse(
-        localStorage.getItem(
-            "selectedProduct"
-        )
-    );
-
-// =============================
-// FALLBACK PRODUCT
-// =============================
-
+const API_BASE = "http://localhost:5000/api";
+const product = JSON.parse(localStorage.getItem("selectedProduct"));
 const fallbackProduct = {
-
     id: 1,
-
     brand: "AnthropicBots",
-
     name: "Modern Fashion T-Shirt",
-
     category: "T-Shirt",
-
     price: 999,
-
     image: "../assets/images/f1.jpg",
-
-    description:
-        "Premium quality cotton t-shirt with breathable fabric and modern fashion styling.",
-
+    description: "Premium quality cotton t-shirt with breathable fabric and modern fashion styling.",
     stock: 12,
-
     rating: 4.5
-
 };
-
-const currentProduct =
-    product || fallbackProduct;
+const currentProduct = product || fallbackProduct;
 
 // =============================
 // RECENTLY VIEWED PRODUCTS
 // =============================
-
-let viewedProducts =
-    JSON.parse(
-        localStorage.getItem(
-            "recentlyViewed"
-        )
-    ) || [];
-
-viewedProducts =
-    viewedProducts.filter(
-        (item) =>
-            item.id !== currentProduct.id
-    );
-
+let viewedProducts = JSON.parse(localStorage.getItem("recentlyViewed")) || [];
+viewedProducts = viewedProducts.filter(item => item.id !== currentProduct.id);
 viewedProducts.unshift({
-
-    id:
-        currentProduct.id,
-
-    name:
-        currentProduct.name,
-
-    brand:
-        currentProduct.brand,
-
-    category:
-        currentProduct.category,
-
-    price:
-        currentProduct.price,
-
-    image:
-        currentProduct.image
-
+    id: currentProduct.id,
+    name: currentProduct.name,
+    brand: currentProduct.brand,
+    category: currentProduct.category,
+    price: currentProduct.price,
+    image: currentProduct.image
 });
-
-viewedProducts =
-    viewedProducts.slice(0, 8);
-
-localStorage.setItem(
-    "recentlyViewed",
-    JSON.stringify(viewedProducts)
-);
+viewedProducts = viewedProducts.slice(0, 8);
+localStorage.setItem("recentlyViewed", JSON.stringify(viewedProducts));
 
 // =============================
 // ELEMENTS
@@ -505,18 +451,16 @@ document.getElementById(
 
     }
 );
+
 // =============================
 // ADD TO CART
 // =============================
 document.getElementById("add-to-cart-btn").addEventListener("click", () => {
     const currentVariantStock = productVariants[selectedColor][selectedSize];
+    const qty = parseInt(qtyInput.value);
 
-    if(currentVariantStock <= 0){
-        alert("Selected variant is out of stock!");
-        return;
-    }
-    if(parseInt(qtyInput.value) > currentVariantStock){
-        alert("Selected quantity exceeds available stock!");
+    if(currentVariantStock <= 0 || qty > currentVariantStock){
+        showToast("Selected variant is out of stock or quantity exceeds stock!", "error");
         return;
     }
 
@@ -524,162 +468,46 @@ document.getElementById("add-to-cart-btn").addEventListener("click", () => {
     const item = {
         id: currentProduct.id,
         name: currentProduct.name,
-        price: `₹${currentProduct.price}`,
+        price: parseFloat(currentProduct.price),
         img: mainImage.src,
         color: selectedColor,
         size: selectedSize,
-        qty: parseInt(qtyInput.value)
+        qty: qty
     };
 
     const existing = cart.find(p => p.id === item.id && p.color === item.color && p.size === item.size);
-    if(existing){
-        existing.qty += item.qty;
-    } else {
-        cart.push(item);
-    }
+    if(existing) existing.qty += item.qty;
+    else cart.push(item);
 
     localStorage.setItem("cart", JSON.stringify(cart));
-    alert("Product added to cart!");
-    // Do NOT reduce stock here; stock reduction happens on checkout/purchase
+    showToast("Product added to cart 🛍️");
 });
 
 // =============================
 // BUY NOW
 // =============================
+document.getElementById("buy-now-btn").addEventListener("click", () => {
+    const currentVariantStock = productVariants[selectedColor][selectedSize];
+    const qty = parseInt(qtyInput.value);
 
-document.getElementById(
-    "buy-now-btn"
-).addEventListener(
-    "click",
-    () => {
-
-        const currentVariantStock =
-            productVariants[
-                selectedColor
-            ][selectedSize];
-
-        if(currentVariantStock <= 0){
-
-            alert(
-                "Selected variant is out of stock!"
-            );
-
-            return;
-
-        }
-
-        if(
-            parseInt(qtyInput.value)
-            > currentVariantStock
-        ){
-
-            alert(
-                "Selected quantity exceeds available stock!"
-            );
-
-            return;
-
-        }
-
-        const cart = [];
-
-        cart.push({
-
-            id:
-                currentProduct.id,
-
-            name:
-                currentProduct.name,
-
-            price:
-                `₹${currentProduct.price}`,
-
-            img:
-                mainImage.src,
-
-            color:
-                selectedColor,
-
-            size:
-                selectedSize,
-
-            qty:
-                parseInt(
-                    qtyInput.value
-                )
-            
-        });
-
-        localStorage.setItem(
-            "cart",
-            JSON.stringify(cart)
-        );
-
-        window.location.href =
-            "checkout.html";
-
+    if(currentVariantStock <= 0 || qty > currentVariantStock){
+        showToast("Selected variant is out of stock or quantity exceeds stock!", "error");
+        return;
     }
-);
 
-const shareButton =
-    document.createElement(
-        "button"
-    );
+    const cart = [{
+        id: currentProduct.id,
+        name: currentProduct.name,
+        price: parseFloat(currentProduct.price),
+        img: mainImage.src,
+        color: selectedColor,
+        size: selectedSize,
+        qty: qty
+    }];
 
-shareButton.id =
-    "share-btn";
-
-shareButton.innerHTML = `
-    <i class="fas fa-share-alt"></i>
-
-    Share
-`;
-
-document.querySelector(
-    ".product-buttons"
-).appendChild(
-    shareButton
-);
-
-shareButton.addEventListener(
-    "click",
-    async () => {
-
-        if(!navigator.share){
-
-            alert(
-                "Sharing not supported on this browser."
-            );
-
-            return;
-
-        }
-
-        try{
-
-            await navigator.share({
-
-                title:
-                    currentProduct.name,
-
-                text:
-                    currentProduct.description,
-
-                url:
-                    window.location.href
-
-            });
-
-        }catch(error){
-
-            console.log(
-                "Share cancelled or unsupported."
-            );
-
-        }
-
-    }
-);
+    localStorage.setItem("cart", JSON.stringify(cart));
+    window.location.href = "checkout.html";
+});
 
 // =============================
 // WISHLIST
@@ -707,17 +535,16 @@ wishlistBtn.addEventListener("click", () => {
             price: currentProduct.price,
             image: currentProduct.image
         });
-        localStorage.setItem("wishlist", JSON.stringify(wishlist));
-        alert("Added to wishlist!");
+        showToast("Added to wishlist ❤️");
     } else {
         wishlist = wishlist.filter(item => item.id !== currentProduct.id);
-        localStorage.setItem("wishlist", JSON.stringify(wishlist));
-        alert("Removed from wishlist!");
+        showToast("Removed from wishlist ❌");
     }
+
+    localStorage.setItem("wishlist", JSON.stringify(wishlist));
     updateWishlistButton();
 });
 
-// Initialize wishlist button state
 updateWishlistButton();
 
 // =============================
@@ -871,105 +698,105 @@ if(reviewForm){
     reviewForm.addEventListener(
         "submit",
         (e) => {
-
+        
             e.preventDefault();
-
+        
             const name =
                 document.getElementById(
                     "review-name"
                 ).value;
-
+            
             const rating =
                 parseInt(
                     document.getElementById(
                         "review-rating"
                     ).value
                 );
-
+            
             const comment =
                 document.getElementById(
                     "review-comment"
                 ).value;
-
+            
             const review = {
-
+            
                 name,
                 rating,
                 comment,
-
+            
                 date:
                     new Date()
                     .toLocaleDateString()
-
+            
             };
-
+        
             reviews.unshift(review);
-
+        
             localStorage.setItem(
                 reviewKey,
                 JSON.stringify(reviews)
             );
-
+        
             renderReviews();
-
+        
             reviewForm.reset();
-
+        
             const total =
                 reviews.reduce(
                     (sum, item) =>
                         sum + item.rating,
                     0
                 );
-
+            
             const average =
                 (
                     total /
                     reviews.length
                 ).toFixed(1);
-
+            
             const updatedRatingContainer =
                 document.querySelector(
                     ".product-rating"
                 );
-
+            
             let updatedStars = "";
-
+            
             for(
                 let i = 0;
                 i < 5;
                 i++
             ){
-
+            
                 if(
                     i < Math.round(average)
                 ){
-
+                
                     updatedStars += `
                         <i class="fas fa-star"></i>
                     `;
-
+                
                 }else{
-
+                
                     updatedStars += `
                         <i class="far fa-star"></i>
                     `;
-
+                
                 }
-
+            
             }
-
+        
             updatedRatingContainer.innerHTML = `
                 ${updatedStars}
-
+        
                 <span id="product-rating-text">
                     (${average} Ratings)
                 </span>
             `;
-
-            alert(
-                "Review submitted!"
+        
+            showToast(
+                "Review submitted! 📝"
             );
-
+        
         }
     );
 

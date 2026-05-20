@@ -4,107 +4,67 @@ const db =
 // =============================
 // GET ALL PRODUCTS
 // =============================
-
 const getProducts =
     (req, res) => {
-
         const query =
             "SELECT * FROM products ORDER BY id DESC";
-
         db.query(
             query,
             (error, results) => {
-
                 if(error){
-
                     return res.status(500).json({
-
                         success: false,
-
                         error
-
                     });
-
                 }
-
                 res.status(200).json({
-
                     success: true,
-
                     products: results
-
                 });
-
             }
         );
-
     };
 
 // =============================
 // GET SINGLE PRODUCT
 // =============================
-
 const getSingleProduct =
     (req, res) => {
-
         const { id } =
             req.params;
-
         const query =
             "SELECT * FROM products WHERE id = ?";
-
         db.query(
             query,
             [id],
             (error, results) => {
-
                 if(error){
-
                     return res.status(500).json({
-
                         success: false,
-
                         error
-
                     });
-
                 }
-
                 if(results.length === 0){
-
                     return res.status(404).json({
-
                         success: false,
-
                         message:
                             "Product not found"
-
                     });
-
                 }
-
                 res.status(200).json({
-
                     success: true,
-
                     product: results[0]
-
                 });
-
             }
         );
-
     };
 
 // =============================
 // CREATE PRODUCT
 // =============================
-
 const createProduct =
     (req, res) => {
-
         const {
-
             name,
             description,
             price,
@@ -114,21 +74,15 @@ const createProduct =
             featured
 
         } = req.body;
-
         if(
             !name ||
-            !price
+            price === undefined
         ){
-
             return res.status(400).json({
-
                 success: false,
-
                 message:
                     "Name and price are required"
-
             });
-
         }
 
         const query =
@@ -158,89 +112,147 @@ const createProduct =
                 featured || false
             ],
             (error, result) => {
-
                 if(error){
-
                     return res.status(500).json({
-
                         success: false,
-
                         error
-
                     });
-
                 }
-
                 res.status(201).json({
-
                     success: true,
-
                     message:
                         "Product created successfully",
-
                     productId:
                         result.insertId
-
                 });
-
             }
         );
+    };
 
+// =============================
+// UPDATE PRODUCT
+// =============================
+const updateProduct =
+    (req, res) => {
+        const { id } =
+            req.params;
+        const {
+            name,
+            description,
+            price,
+            image,
+            category,
+            stock,
+            featured
+        } = req.body;
+        if(
+            !name ||
+            price === undefined
+        ){
+            return res.status(400).json({
+                success: false,
+                message:
+                    "Name and price are required"
+            });
+        }
+        if(
+            isNaN(price) ||
+            price <= 0
+        ){
+            return res.status(400).json({
+                success: false,
+                message:
+                    "Invalid product price"
+            });
+        }
+        if(
+            isNaN(price) ||
+            price <= 0
+        ){
+            return res.status(400).json({
+                success: false,
+                message:
+                    "Invalid product price"
+            });
+        }
+
+        const query =
+            `
+            UPDATE products
+            SET
+                name = ?,
+                description = ?,
+                price = ?,
+                image = ?,
+                category = ?,
+                stock = ?,
+                featured = ?
+            WHERE id = ?
+            `;
+
+        db.query(
+            query,
+            [
+                name,
+                description,
+                price,
+                image,
+                category,
+                stock || 0,
+                featured || false,
+                id
+            ],
+            (error, result) => {
+                if(error){
+                    return res.status(500).json({
+                        success: false,
+                        error
+                    });
+                }
+                res.status(200).json({
+                    success: true,
+                    message:
+                        "Product updated successfully"
+                });
+            }
+        );
     };
 
 // =============================
 // DELETE PRODUCT
 // =============================
-
 const deleteProduct =
     (req, res) => {
-
         const { id } =
             req.params;
-
         const query =
             "DELETE FROM products WHERE id = ?";
-
         db.query(
             query,
             [id],
             (error, result) => {
-
                 if(error){
-
                     return res.status(500).json({
-
                         success: false,
-
                         error
-
                     });
-
                 }
-
                 res.status(200).json({
-
                     success: true,
-
                     message:
                         "Product deleted successfully"
-
                 });
-
             }
         );
-
     };
 
 // =============================
 // EXPORTS
 // =============================
-
 module.exports = {
-
     getProducts,
     getSingleProduct,
     createProduct,
+    updateProduct,
     deleteProduct
-
 };

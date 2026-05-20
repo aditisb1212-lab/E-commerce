@@ -5,12 +5,11 @@ const router =
     express.Router();
 
 const {
-
     getProducts,
     getSingleProduct,
     createProduct,
+    updateProduct,
     deleteProduct
-
 } = require(
     "../controllers/productController"
 );
@@ -18,37 +17,46 @@ const {
 const authMiddleware =
     require("../middleware/authMiddleware");
 
+const adminMiddleware =
+    require("../middleware/adminMiddleware");
+
 // =============================
 // PRODUCT ROUTES
 // =============================
 
 // Get all products
-
 router.get(
     "/",
     getProducts
 );
 
 // Get single product
-
 router.get(
     "/:id",
     getSingleProduct
 );
 
 // Create product
-
 router.post(
     "/",
     authMiddleware,
+    adminMiddleware,
     createProduct
 );
 
-// Delete product
+// UPDATE PRODUCT
+router.put(
+    "/:id",
+    authMiddleware,
+    adminMiddleware,
+    updateProduct
+);
 
+// Delete product
 router.delete(
     "/:id",
     authMiddleware,
+    adminMiddleware,
     deleteProduct
 );
 

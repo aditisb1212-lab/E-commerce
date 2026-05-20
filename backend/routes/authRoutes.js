@@ -5,10 +5,8 @@ const router =
     express.Router();
 
 const {
-
     signup,
     login
-
 } = require(
     "../controllers/authController"
 );
@@ -16,7 +14,6 @@ const {
 // =============================
 // AUTH ROUTES
 // =============================
-
 router.post(
     "/signup",
     signup
@@ -28,19 +25,18 @@ router.post(
 );
 
 // =============================
-// TEST ROUTE
+// AUTH STATUS ROUTE
 // =============================
-
-router.get("/", (req, res) => {
-
-    res.json({
-
-        message:
-            "Auth Routes Working"
-
-    });
-
-});
+router.get(
+    "/status",
+    (req, res) => {
+        res.status(200).json({
+            success: true,
+            message:
+                "Auth API running"
+        });
+    }
+);
 
 module.exports =
     router;

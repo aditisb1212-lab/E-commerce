@@ -3,11 +3,9 @@ console.log(
 );
 
 // =============================
-// API URL
+// API BASE URL
 // =============================
-
-const API_URL =
-    "http://localhost:5000/api/products";
+const API_BASE = "http://localhost:5000/api";
 
 // =============================
 // PRODUCTS ARRAY
@@ -42,94 +40,42 @@ const productContainer =
 // =============================
 // FETCH PRODUCTS
 // =============================
-
-async function fetchProducts(){
-
-    try{
-
-        const response =
-            await fetch(API_URL);
-
-        const data =
-            await response.json();
-
-        if(data.success){
-
-            allProducts =
-                data.products;
-
-            renderProducts(
-                allProducts
-            );
-
+async function fetchProducts() {
+    try {
+        const response = await fetch(`${API_BASE}/products`);
+        const data = await response.json();
+        if(data.success) {
+            allProducts = data.products;
+            renderProducts(allProducts);
         }
-
-    }catch(error){
-
-        console.log(error);
-
-        productContainer.innerHTML = `
-            <h3>
-                Failed to load products.
-            </h3>
-        `;
-
+    } catch(error) {
+        console.error(error);
+        productContainer.innerHTML = `<h3>Failed to load products.</h3>`;
     }
-
 }
 
 // =============================
-// RENDER PRODUCTS
+// RENDER PRODUCTS (MODULAR)
 // =============================
-
-function renderProducts(products){
-
+function renderProducts(products) {
     productContainer.innerHTML = "";
 
-    if(products.length === 0){
-
-        productContainer.innerHTML = `
-            <h3>
-                No products found.
-            </h3>
-        `;
-
+    if(products.length === 0) {
+        productContainer.innerHTML = `<h3>No products found.</h3>`;
         return;
-
     }
 
-    products.forEach((product) => {
-
-        const productCard =
-            document.createElement("div");
-
-        productCard.classList.add(
-            "pro"
-        );
-
-        productCard.dataset.category =
-            product.category || "other";
-
-        productCard.dataset.price =
-            product.price;
+    products.forEach(product => {
+        const productCard = document.createElement("div");
+        productCard.classList.add("pro");
+        productCard.dataset.category = product.category || "other";
+        productCard.dataset.price = product.price;
 
         productCard.innerHTML = `
-
-            <img
-                src="${
-                    product.image ||
-                    "../assets/images/f1.jpg"
-                }"
-                alt="${product.name}"
-            >
-
+            <img src="${product.image || '../assets/images/f1.jpg'}" alt="${product.name}">
             <div class="des">
-                <span>
-                    ${product.category || "Brand"}
-                </span>
-                <h5>
-                    ${product.name}
-                </h5>
+                <span>${product.category || 'Brand'}</span>
+                <h5>${product.name}</h5>
                 <div class="star">
                     <i class="fas fa-star"></i>
                     <i class="fas fa-star"></i>
@@ -137,137 +83,55 @@ function renderProducts(products){
                     <i class="fas fa-star"></i>
                     <i class="fas fa-star"></i>
                 </div>
-                <h4>
-                    ₹${product.price}
-                </h4>
-                <p class="stock-info">
-                    ${
-                        product.stock > 0
-                        ? `Stock: ${product.stock}`
-                        : "Out Of Stock"
-                    }
-                </p>
+                <h4>₹${product.price}</h4>
+                <p class="stock-info">${product.stock > 0 ? `Stock: ${product.stock}` : 'Out Of Stock'}</p>
             </div>
-
-            ${
-                product.stock === 0
-                ? `
-                    <button class="out-stock-btn">
-                        Out Of Stock
-                    </button>
-                `
-                : `
-                    <a href="#">
-                        <i class="fal fa-shopping-cart cart"></i>
-                    </a>
-                `
-            }
+            ${product.stock === 0
+                ? `<button class="out-stock-btn">Out Of Stock</button>`
+                : `<a href="#"><i class="fal fa-shopping-cart cart"></i></a>`}
         `;
 
-        // =============================
-        // PRODUCT REDIRECT
-        // =============================
-        productCard.addEventListener(
-            "click",
-            () => {
+        // Redirect to product page
+        productCard.addEventListener("click", () => {
+            localStorage.setItem("selectedProduct", JSON.stringify(product));
+            window.location.href = "product.html";
+        });
 
-                localStorage.setItem(
-                    "selectedProduct",
-                    JSON.stringify(product)
-                );
+        // Add to cart
+        const cartBtn = productCard.querySelector(".cart");
+        if(cartBtn) {
+            cartBtn.addEventListener("click", (e) => {
+                e.preventDefault();
+                e.stopPropagation();
 
-                window.location.href =
-                    "product.html";
+                let cart = JSON.parse(localStorage.getItem("cart")) || [];
+                const item = {
+                    id: product.id,
+                    name: product.name,
+                    price: parseFloat(product.price),
+                    img: product.image,
+                    qty: 1
+                };
 
-            }
-        );
+                const existing = cart.find(p => p.id === item.id);
+                if(existing) existing.qty++;
+                else cart.push(item);
 
-        // =============================
-        // ADD TO CART
-        // =============================
-        const cartBtn =
-            productCard.querySelector(
-                ".cart"
-            );
-
-        if(cartBtn){
-
-            cartBtn.addEventListener(
-                "click",
-                (e) => {
-
-                    e.preventDefault();
-
-                    e.stopPropagation();
-
-                    let cart =
-                        JSON.parse(
-                            localStorage.getItem(
-                                "cart"
-                            )
-                        ) || [];
-
-                    const item = {
-
-                        id:
-                            product.id,
-
-                        name:
-                            product.name,
-
-                        price:
-                            `₹${product.price}`,
-
-                        img:
-                            product.image,
-
-                        qty: 1
-
-                    };
-
-                    const existing =
-                        cart.find(
-                            (p) =>
-                                p.id === item.id
-                        );
-
-                    if(existing){
-
-                        existing.qty++;
-
-                    }else{
-
-                        cart.push(item);
-
-                    }
-
-                    localStorage.setItem(
-                        "cart",
-                        JSON.stringify(cart)
-                    );
-
-                    alert(
-                        "Added to cart!"
-                    );
-
-                }
-            );
-
+                localStorage.setItem("cart", JSON.stringify(cart));
+                showToast("Added to cart 🛍️");
+            });
         }
 
-        productContainer.appendChild(
-            productCard
-        );
-
+        productContainer.appendChild(productCard);
     });
-
 }
 
 // =============================
-// INITIAL FETCH
+// INITIALIZATION
 // =============================
-
-fetchProducts();
+document.addEventListener("DOMContentLoaded", () => {
+    fetchProducts();
+});
 
 // =============================
 // SEARCH FILTER
