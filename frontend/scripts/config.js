@@ -12,9 +12,7 @@ const isLocalhost =
 const CONFIG = {
     // api base url
     API_BASE:
-        isLocalhost
-            ? "https://e-commerce-production-d546.up.railway.app/api"
-            : "https://backend-not-deployed-yet.com/api",
+        "https://e-commerce-production-d546.up.railway.app/api",
 
     // app info
     APP_NAME:

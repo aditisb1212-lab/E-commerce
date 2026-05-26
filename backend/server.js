@@ -48,9 +48,11 @@ const allowedOrigins = [
     "http://localhost:5501",
     "http://127.0.0.1:5501",
     "http://10.132.110.66:5501",
-    "http://10.147.216.66:5501"
-];
+    "http://10.147.216.66:5501",
 
+    // vercel frontend
+    "https://e-commerce-git-main-bhuvanshs-projects.vercel.app/"
+];
 // cors
 app.use(
     cors({
