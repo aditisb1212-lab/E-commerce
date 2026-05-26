@@ -218,6 +218,8 @@ E-commerce/
 ├── package.json
 ├── package-lock.json
 └── README.md
+```
+
 ---
 
 ## 🚀 Local Setup Guide
