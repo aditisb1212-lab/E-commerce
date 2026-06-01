@@ -1,24 +1,23 @@
 /* HEADER */
+/* ==================== DESKTOP HEADER & NAVBAR ==================== */
 #header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 20px 80px;
-    background: var(--bg-light);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.06);
+    background: var(--bg-light, #ffffff);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.06);
     position: sticky;
     top: 0;
     left: 0;
     z-index: 999;
 }
 
-/* LOGO */
-.logo {
-    width: 140px;
-    object-fit: contain;
+#header .logo {
+    width: 130px; /* Logo ka size standard kiya */
+    height: auto;
 }
 
-/* NAVIGATION */
 #navbar-links {
     display: flex;
     align-items: center;
@@ -35,36 +34,125 @@
     text-decoration: none;
     font-size: 16px;
     font-weight: 600;
-    color: var(--text-dark);
-    transition: var(--transition-fast);
+    color: var(--text-dark, #222);
+    transition: var(--transition-fast, 0.3s);
     background: none;
     border: none;
     cursor: pointer;
 }
 
-/* touch target */
-#navbar-links li button,
-#navbar-links li a {
-    min-height: 44px;
-    display: flex;
-    align-items: center;
-}
-
 #navbar-links li a:hover,
 #navbar-links li a.active {
-    color: var(--primary-color);
+    color: var(--primary-color, #088178);
 }
 
-/* underline */
-#navbar-links li a.active::after,
-#navbar-links li a:hover::after {
-    content: "";
-    width: 30%;
-    height: 2px;
-    background: var(--primary-color);
-    position: absolute;
-    bottom: -4px;
-    left: 0;
+/* Hide Hamburger Button on Desktop */
+#mobile-menu-btn {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--text-dark, #222);
+    z-index: 2000;
+}
+
+
+#mobile-close-btn {
+    display: none;
+}
+
+
+/* ==================== RESPONSIVE (TABLET & MOBILE) ==================== */
+
+@media (max-width: 799px) {
+    #header {
+        padding: 20px 30px;
+    }
+
+    #mobile-menu-btn {
+        display: block;
+    }
+
+    #navbar-links {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+        gap: 25px;
+        
+      
+        position: fixed;
+        top: 0;
+        right: -320px; 
+        height: 100vh;
+        width: 300px;
+        background: var(--bg-light, #ffffff);
+        padding: 100px 30px;
+        box-shadow: -10px 0 30px rgba(0, 0, 0, 0.05);
+        transition: 0.3s ease;
+        z-index: 9999; 
+    }
+
+
+    #navbar-links.active {
+        right: 0;
+    }
+
+
+    #mobile-close-btn {
+        display: block;     
+        position: absolute;  
+        top: 30px;         
+        right: 30px;         
+        cursor: pointer;
+        z-index: 10005;       
+        background: none;
+        border: none;
+    }
+
+    #mobile-close-btn svg.cross {
+        width: 24px;
+        height: 24px;
+        fill: var(--text-dark, #222);
+        transition: 0.3s ease;
+        display: block;
+    }
+
+    #mobile-close-btn:hover svg.cross {
+        fill: var(--primary-color, #088178);
+    }
+
+    /* Profile Dropdown adjustments for Mobile */
+    #profile-dropdown {
+        position: static;
+        display: none;
+        width: 100%;
+        box-shadow: none;
+        padding: 10px 0 0 15px;
+    }
+
+    #profile-dropdown.active {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+}
+
+@media (max-width: 477px) {
+    #header {
+        padding: 12px 20px;
+    }
+
+    #header .logo {
+        width: 110px;
+    }
+    
+
+    #mobile-close-btn {
+        top: 25px;
+        right: 25px;
+    }
 }
 
 /* CART */
@@ -157,6 +245,9 @@ footer {
     flex-wrap: wrap;
     justify-content: space-between;
     background: #fafafa;
+    width: 100%;
+    padding: 40px 80px; /* Thoda padding add kiya taaki desktop par acha lage */
+    box-sizing: border-box;
 }
 
 footer .col {
@@ -206,18 +297,25 @@ footer .follow a:hover {
     color: var(--primary-color);
 }
 
+/* App Install section ki row (App Store + Play Store) */
 footer .install .row {
     display: flex;
     gap: 10px;
+    margin: 10px 0 15px 0;
 }
 
 footer .install .row img {
     border: 1px solid var(--primary-color);
     border-radius: 6px;
+    width: 130px; /* App buttons ka standard size fixed kiya */
+    height: auto;
 }
 
-footer .install img {
+/* ✅ Payment Gateways waali Single Image ka Fix */
+footer .install > img {
     margin: 10px 0 15px 0;
+    max-width: 100%;  /* Taaki mobile screen se badi na ho */
+    height: auto;     /* Aspect ratio kharab na ho */
 }
 
 footer a:hover {
@@ -228,12 +326,18 @@ footer .copyright {
     width: 100%;
     text-align: center;
     margin-top: 20px;
+    border-top: 1px solid #e1e1e1;
+    padding-top: 20px;
 }
 
 /* RESPONSIVE */
 @media(max-width:799px) {
     #header {
         padding: 20px 30px;
+    }
+
+    footer {
+        padding: 40px 30px; /* Mobile/Tablet par edges se space banega */
     }
 
     #navbar-links {
@@ -287,10 +391,17 @@ footer .copyright {
 
     footer {
         text-align: center;
+        padding: 40px 20px;
     }
 
     footer .col {
         align-items: center;
+        width: 100%; /* Pura space legi mobile par */
+    }
+
+    /* Mobile par buttons aur payment centrally align honge */
+    footer .install .row {
+        justify-content: center; 
     }
 }
 
