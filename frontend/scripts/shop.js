@@ -1,3 +1,7 @@
+// PRODUCTS STATE
+(function(){
+    let allProducts = [];
+let filteredProducts = [];
 // PAGINATION STATE
 let currentPage = 1;
 let totalPages = 1;
@@ -677,3 +681,4 @@ document.addEventListener(
         setupSorting();
     }
 );
+})()
