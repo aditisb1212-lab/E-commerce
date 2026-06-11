@@ -518,54 +518,10 @@ function initializeProductCardFeatures() {
 }
 
 
-// navbar auth sync
-function syncNavbarAuth() {
-
-    const user =
-        AppUtils.getUser();
-
-    const authButtons =
-        document.querySelectorAll(
-            "[data-auth-state]"
-        );
-
-    authButtons.forEach(
-        (
-            element
-        ) => {
-
-            const requiredState =
-                element.dataset.authState;
-
-            if (
-                requiredState === "authenticated"
-            ) {
-
-                element.style.display =
-                    user
-                        ? ""
-                        : "none";
-            }
-
-            if (
-                requiredState === "guest"
-            ) {
-
-                element.style.display =
-                    user
-                        ? "none"
-                        : "";
-            }
-        }
-    );
-}
-
 // init
 document.addEventListener(
     "DOMContentLoaded",
     () => {
-
-        syncNavbarAuth();
 
         fetchAllProducts();
     }
