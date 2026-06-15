@@ -177,20 +177,17 @@ async function fetchProducts(
 }
 
 // EMPTY STATE
-function renderEmptyState(
-    message
-) {
-    if (
-        !elements.productContainer
-    ) {
-        return;
-    }
-    elements.productContainer.innerHTML =
-        `
-            <div class="empty-products">
-                <h3>${message}</h3>
-            </div>
-        `;
+function renderEmptyState(message) {
+    if (!elements.productContainer) return;
+    const isError = message.toLowerCase().includes("failed") || message.toLowerCase().includes("error");
+    elements.productContainer.innerHTML = `
+        <div class="empty-state-container">
+            <div class="empty-state-icon">${isError ? 'üì°' : 'üõçÔ∏è'}</div>
+            <h3 class="empty-state-title">${isError ? "Couldn't load products" : "No products found"}</h3>
+            <p class="empty-state-message">${isError ? "Please check your connection and try again." : message}</p>
+            ${isError ? `<button class="retry-btn" onclick="fetchProducts(1)">üîÑ Retry</button>` : ''}
+        </div>
+    `;
 }
 
 // STAR RATINGS
@@ -432,7 +429,7 @@ function setupProductCard(
                 );
 
                 AppUtils.notify(
-                    "Added to cart =É¢Ïn+≈",
+                    "Added to cart =ÔøΩÔøΩÔøΩn+ÔøΩ",
                     "success"
                 );
 
@@ -478,7 +475,7 @@ function setupProductCard(
                     }
                 } else {
                     wishlist.push(product);
-                    AppUtils.notify("Added to wishlist G•Òn+≈", "success");
+                    AppUtils.notify("Added to wishlist GÔøΩÔøΩn+ÔøΩ", "success");
                     if (token) {
                         try {
                             await AppUtils.apiRequest("/wishlist/add", {
@@ -704,7 +701,7 @@ function renderPagination() {
         );
 
     prevBtn.innerText =
-        "GÂ… Prev";
+        "GÔøΩÔøΩ Prev";
 
     prevBtn.className = 
         "pagination-btn";
@@ -752,7 +749,7 @@ function renderPagination() {
         );
 
     nextBtn.innerText =
-        "Next GÂ∆";
+        "Next GÔøΩÔøΩ";
 
     nextBtn.className = 
         "pagination-btn";
