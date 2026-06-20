@@ -348,13 +348,13 @@ const login =
                 ).length
             ) {
 
-                return res.status(400)
+                return res.status(404)
                     .json({
 
                         success: false,
 
                         message:
-                            "Invalid credentials"
+                            "Email is not registered. Please sign up first."
                     });
             }
 
@@ -393,7 +393,7 @@ const login =
                         success: false,
 
                         message:
-                            "Invalid credentials"
+                            "Incorrect password. Please try again."
                     });
             }
 

@@ -1,47 +1,6 @@
 let allProducts = [];
 
-const fallbackProducts = [
-  {
-    id: "fb1",
-    name: "Classic Cotton Hoodie",
-    category: "Hoodies",
-    price: 29.99,
-    image: "assets/images/f1.png",
-    featured: 1,
-    stock: 20,
-    rating: 4.5,
-  },
-  {
-    id: "fb2",
-    name: "Summer Floral Tee",
-    category: "T-Shirts",
-    price: 19.99,
-    image: "assets/images/f2.png",
-    featured: 0,
-    stock: 18,
-    rating: 4.0,
-  },
-  {
-    id: "fb3",
-    name: "Sporty Windbreaker",
-    category: "Jackets",
-    price: 49.99,
-    image: "assets/images/banner.png",
-    featured: 0,
-    stock: 15,
-    rating: 4.2,
-  },
-  {
-    id: "fb4",
-    name: "Denim Jacket",
-    category: "Jackets",
-    price: 59.99,
-    image: "assets/images/b7.jpg",
-    featured: 1,
-    stock: 12,
-    rating: 4.7,
-  },
-];
+
 
 let isLoading = false;
 
@@ -75,11 +34,11 @@ async function fetchAllProducts() {
     if (data && data.success) {
       allProducts = AppUtils.safeArray(data.products);
     } else {
-      allProducts = fallbackProducts.slice();
+      allProducts = [];
     }
   } catch (error) {
     console.error("PRODUCT FETCH ERROR:", error);
-    allProducts = fallbackProducts.slice();
+    allProducts = [];
   }
   {
     window.allProducts = allProducts;
@@ -186,10 +145,10 @@ function createQuickViewModal(imageSrc, imageAlt) {
 
   const image = document.createElement("img");
   image.src =
-    typeof escapeHTML === "function" ? escapeHTML(imageSrc) : imageSrc;
+    typeof AppUtils !== "undefined" && typeof AppUtils.escapeHTML === "function" ? AppUtils.escapeHTML(imageSrc) : imageSrc;
   image.alt =
-    typeof escapeHTML === "function"
-      ? escapeHTML(imageAlt || "Product Image")
+    typeof AppUtils !== "undefined" && typeof AppUtils.escapeHTML === "function"
+      ? AppUtils.escapeHTML(imageAlt || "Product Image")
       : imageAlt || "Product Image";
   image.style.cssText = `
         width: 100%;
