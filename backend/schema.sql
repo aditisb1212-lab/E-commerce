@@ -13,10 +13,11 @@ CREATE TABLE IF NOT EXISTS users (
         NOT NULL,
 
     role ENUM(
-        'user',
+        'customer',
+        'support',
         'admin'
     )
-    DEFAULT 'user',
+    DEFAULT 'customer',
 
     refresh_token VARCHAR(255),
 

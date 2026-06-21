@@ -31,7 +31,8 @@ const Recommendations = (() => {
       const response = await window.AppUtils.apiRequest("/recommendations?limit=8");
       
       if (response && response.success && response.data && response.data.length > 0) {
-        // Ensure UI functions are available and use the correct arguments
+        // Ensure UI functions are available
+       // Ensure UI functions are available and use the correct arguments
         if (typeof window.createProductCard === "function") {
           container.innerHTML = response.data.map(window.createProductCard).join("");
           if (typeof window.addProductCardAnimations === "function") {
@@ -46,6 +47,7 @@ const Recommendations = (() => {
           response.data.forEach(product => window.renderProductCard(product, container));
         } else {
           console.warn("No compatible product renderer found, skipping render.");
+        }
         }
       } else {
         // Hide if no recommendations
