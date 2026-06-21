@@ -1,5 +1,3 @@
-// recommendations.js
-
 const Recommendations = (() => {
   const postInteraction = async (productId, type) => {
     const user = window.AppUtils.getUser();
@@ -15,13 +13,15 @@ const Recommendations = (() => {
     }
   };
 
-  const loadRecommendations = async (containerId = "recommended-products-container") => {
+  const loadRecommendations = async (
+    containerId = "recommended-products-container"
+  ) => {
     const container = window.AppUtils.$(containerId);
     if (!container) return;
 
     const user = window.AppUtils.getUser();
     if (!user) {
-      // If not logged in, we can either hide the section or just return
+      // If not logged in, hide recommendations section
       const section = container.closest("section");
       if (section) section.style.display = "none";
       return;
@@ -33,8 +33,22 @@ const Recommendations = (() => {
       if (response && response.success && response.data && response.data.length > 0) {
 // Ensure UI functions are available and use the correct arguments
 
+      const response = await window.AppUtils.apiRequest(
+        "/recommendations?limit=8"
+      );
+
+      if (
+        response &&
+        response.success &&
+        response.data &&
+        response.data.length > 0
+      ) {
+        // Ensure UI functions are available and use the correct arguments
         if (typeof window.createProductCard === "function") {
-          container.innerHTML = response.data.map(window.createProductCard).join("");
+          container.innerHTML = response.data
+            .map(window.createProductCard)
+            .join("");
+
           if (typeof window.addProductCardAnimations === "function") {
             window.addProductCardAnimations(`#${containerId}`);
           }
@@ -44,10 +58,13 @@ const Recommendations = (() => {
         } else if (typeof window.renderProductCard === "function") {
           // product-render.js defines: renderProductCard(product, container)
           container.innerHTML = "";
-          response.data.forEach(product => window.renderProductCard(product, container));
+          response.data.forEach((product) =>
+            window.renderProductCard(product, container)
+          );
         } else {
-          console.warn("No compatible product renderer found, skipping render.");
-        }
+          console.warn(
+            "No compatible product renderer found, skipping render."
+          );
         }
       } else {
         // Hide if no recommendations
@@ -64,7 +81,7 @@ const Recommendations = (() => {
   const initViewTracking = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const productId = urlParams.get("id");
-    
+
     if (window.location.pathname.includes("product.html") && productId) {
       // Record a view
       postInteraction(parseInt(productId, 10), "view");
@@ -79,7 +96,7 @@ const Recommendations = (() => {
 
   return {
     postInteraction,
-    loadRecommendations
+    loadRecommendations,
   };
 })();
 
