@@ -1,5 +1,5 @@
 /**
- * E-Commerce Website - TShirt Collection Logic
+ * E-Commerce Website - Women's Collection Logic
  * Handles product fetching, local fallbacks, filtering, sorting, and UI rendering.
  */
 (function() {
@@ -15,41 +15,31 @@
     // 2. HARDCODED FALLBACK DATA (Backend offline hone par yeh show hoga)
     const fallbackProducts = [
         { 
-            id: '401', 
-            name: 'Cotton Summer Tshirt', 
-            price: 550.00, 
-            image: 'assets/images/girl-tshirt.webp', 
-            category: 'women', 
-            brand: 'H&M',
+            id: '201', 
+            name: 'Pure Traditional Vibe', 
+            price: 899.00, 
+            image: 'assets/images/WomenTraditional.jpeg', 
+            category: 'traditionalWear', 
+            brand: 'Ekaya',
             stock: 12, 
             rating: 5 
         },
         { 
-            id: '402', 
-            name: 'Premium Mens T-shirt', 
-            price: 599.00, 
-            image: 'assets/images/black-tshirt.jpg', 
-            category: 'men', 
+            id: '202', 
+            name: 'Comfort Fit Classic Denim Jeans', 
+            price: 680.00, 
+            image: 'assets/images/womensJeans.webp', 
+            category: 'Jeans', 
             brand: 'Levis',
             stock: 25, 
             rating: 4 
         },
         { 
-            id: '403', 
-            name: 'Daily where T-shirt', 
-            price: 499.00, 
-            image: 'assets/images/men-tshirt-simple.jpeg', 
-            category: 'men', 
-            brand: 'Zara',
-            stock: 8, 
-            rating: 5 
-        },
-        { 
-            id: '404', 
-            name: 'Combo Set', 
-            price: 799.00, 
-            image: 'assets/images/three-tshirt.webp', 
-            category: 'women', 
+            id: '203', 
+            name: 'Compfy Tops', 
+            price: 350.00, 
+            image: 'assets/images/womensTop.jpg', 
+            category: 'tops', 
             brand: 'Zara',
             stock: 8, 
             rating: 5 
@@ -69,14 +59,14 @@
         try {
             currentPage = page;
             if (elements.productContainer) {
-                elements.productContainer.innerHTML = `<div class="loading-products">Loading T-Shirt collection...</div>`;
+                elements.productContainer.innerHTML = `<div class="loading-products">Loading Women's collection...</div>`;
             }
 
             // Backend URL parameters create karna
             const params = new URLSearchParams({
                 page: currentPage,
                 limit: 8,
-        
+                
             });
 
             if (currentSearch) params.append("search", currentSearch);
@@ -96,7 +86,7 @@
             applySorting();
             renderProducts(currentProducts);
         } catch (error) {
-            console.warn("MEN FETCH ERROR (Using Fallback Data):", error);
+            console.warn("WOMEN FETCH ERROR (Using Fallback Data):", error);
             // BACKEND OFF HONE PAR YEH BLOCK CHALEGA
             useFallbackData();
             applySorting();
@@ -140,7 +130,7 @@
         elements.productContainer.innerHTML = ""; // Container clear karna
 
         if (products.length === 0) {
-            elements.productContainer.innerHTML = `<p class="no-products">No products found in T-Shirt Collection.</p>`;
+            elements.productContainer.innerHTML = `<p class="no-products">No products found in Women's Collection.</p>`;
             return;
         }
 

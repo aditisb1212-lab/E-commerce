@@ -31,12 +31,22 @@ const Recommendations = (() => {
       const response = await window.AppUtils.apiRequest("/recommendations?limit=8");
       
       if (response && response.success && response.data && response.data.length > 0) {
-        // Ensure UI functions are available
-        if (typeof window.renderProducts === "function") {
-          window.renderProducts(response.data, containerId);
+// Ensure UI functions are available and use the correct arguments
+        if (typeof window.createProductCard === "function") {
+          container.innerHTML = response.data.map(window.createProductCard).join("");
+          if (typeof window.addProductCardAnimations === "function") {
+            window.addProductCardAnimations(`#${containerId}`);
+          }
+        } else if (typeof window.renderProducts === "function") {
+          // script.js defines: renderProducts(container, products)
+          window.renderProducts(container, response.data);
+        } else if (typeof window.renderProductCard === "function") {
+          // product-render.js defines: renderProductCard(product, container)
+          container.innerHTML = "";
+          response.data.forEach(product => window.renderProductCard(product, container));
         } else {
-          // fallback to manual render if window.renderProducts isn't globally available
-          console.warn("window.renderProducts not found, skipping render.");
+          console.warn("No compatible product renderer found, skipping render.");
+        }
         }
       } else {
         // Hide if no recommendations

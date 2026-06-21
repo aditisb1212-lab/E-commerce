@@ -1,5 +1,5 @@
 /**
- * E-Commerce Website - TShirt Collection Logic
+ * E-Commerce Website - Men's Collection Logic
  * Handles product fetching, local fallbacks, filtering, sorting, and UI rendering.
  */
 (function() {
@@ -15,41 +15,31 @@
     // 2. HARDCODED FALLBACK DATA (Backend offline hone par yeh show hoga)
     const fallbackProducts = [
         { 
-            id: '401', 
-            name: 'Cotton Summer Tshirt', 
-            price: 550.00, 
-            image: 'assets/images/girl-tshirt.webp', 
-            category: 'women', 
-            brand: 'H&M',
+            id: '101', 
+            name: 'Pure Cotton Casual Slim-Fit Shirt', 
+            price: 599.00, 
+            image: 'assets/images/mensShirt.jpg', 
+            category: 'shirt', 
+            brand: 'Adidas',
             stock: 12, 
             rating: 5 
         },
         { 
-            id: '402', 
-            name: 'Premium Mens T-shirt', 
-            price: 599.00, 
-            image: 'assets/images/black-tshirt.jpg', 
-            category: 'men', 
+            id: '102', 
+            name: 'Comfort Fit Classic Denim Jeans', 
+            price: 699.00, 
+            image: 'assets/images/mensJeans.avif', 
+            category: 'jeans', 
             brand: 'Levis',
             stock: 25, 
             rating: 4 
         },
         { 
-            id: '403', 
-            name: 'Daily where T-shirt', 
-            price: 499.00, 
-            image: 'assets/images/men-tshirt-simple.jpeg', 
-            category: 'men', 
-            brand: 'Zara',
-            stock: 8, 
-            rating: 5 
-        },
-        { 
-            id: '404', 
-            name: 'Combo Set', 
-            price: 799.00, 
-            image: 'assets/images/three-tshirt.webp', 
-            category: 'women', 
+            id: '103', 
+            name: 'Modern Denim Outerwear Jacket', 
+            price: 899.00, 
+            image: 'assets/images/MensJacket.webp', 
+            category: 'jacket', 
             brand: 'Zara',
             stock: 8, 
             rating: 5 
@@ -69,7 +59,7 @@
         try {
             currentPage = page;
             if (elements.productContainer) {
-                elements.productContainer.innerHTML = `<div class="loading-products">Loading T-Shirt collection...</div>`;
+                elements.productContainer.innerHTML = `<div class="loading-products">Loading Men's collection...</div>`;
             }
 
             // Backend URL parameters create karna
@@ -140,7 +130,7 @@
         elements.productContainer.innerHTML = ""; // Container clear karna
 
         if (products.length === 0) {
-            elements.productContainer.innerHTML = `<p class="no-products">No products found in T-Shirt Collection.</p>`;
+            elements.productContainer.innerHTML = `<p class="no-products">No products found in Men's Collection.</p>`;
             return;
         }
 
