@@ -13,10 +13,11 @@ CREATE TABLE IF NOT EXISTS users (
         NOT NULL,
 
     role ENUM(
-        'user',
+        'customer',
+        'support',
         'admin'
     )
-    DEFAULT 'user',
+    DEFAULT 'customer',
 
     refresh_token VARCHAR(255),
 
@@ -120,7 +121,7 @@ CREATE TABLE IF NOT EXISTS orders (
 
     FOREIGN KEY (user_id)
         REFERENCES users(id)
-        ON DELETE SET NULL,
+        ON DeleteE SET NULL,
 
     CHECK (total >= 0)
 );
@@ -150,11 +151,11 @@ CREATE TABLE IF NOT EXISTS order_items (
 
     FOREIGN KEY (order_id)
         REFERENCES orders(id)
-        ON DELETE CASCADE,
+        ON DeleteE CASCADE,
 
     FOREIGN KEY (product_id)
         REFERENCES products(id)
-        ON DELETE SET NULL,
+        ON DeleteE SET NULL,
 
     CHECK (price >= 0),
 
@@ -195,11 +196,11 @@ CREATE TABLE IF NOT EXISTS wishlist_items (
 
     FOREIGN KEY (user_id)
         REFERENCES users(id)
-        ON DELETE CASCADE,
+        ON DeleteE CASCADE,
 
     FOREIGN KEY (product_id)
         REFERENCES products(id)
-        ON DELETE CASCADE,
+        ON DeleteE CASCADE,
 
     UNIQUE KEY user_product_unique (user_id, product_id)
 );
@@ -210,6 +211,27 @@ ON wishlist_items(user_id);
 
 CREATE INDEX idx_wishlist_items_product
 ON wishlist_items(product_id);
+
+-- user interactions table
+CREATE TABLE IF NOT EXISTS user_interactions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    product_id INT NOT NULL,
+    interaction_type ENUM('view', 'cart_add', 'wishlist_add', 'purchase') NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+);
+
+-- indexes
+CREATE INDEX idx_user_interactions_user
+ON user_interactions(user_id);
+
+CREATE INDEX idx_user_interactions_product
+ON user_interactions(product_id);
+
+CREATE INDEX idx_user_interactions_type
+ON user_interactions(interaction_type);
 
 -- Serviceable pincodes for delivery availability check
 CREATE TABLE IF NOT EXISTS serviceable_pincodes (
