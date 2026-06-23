@@ -163,6 +163,20 @@ const createProductReview = async (req, res) => {
             });
         }
 
+        const [existing] = await connection.query(
+            "SELECT id FROM reviews WHERE product_id = ? AND user_id = ? LIMIT 1",
+            [productId, userId]
+        );
+
+        if (safeArray(existing).length > 0) {
+            await connection.rollback();
+
+            return res.status(400).json({
+                success: false,
+                message: "You have already reviewed this product"
+            });
+        }
+
         const [result] = await connection.query(
             `
                 INSERT INTO reviews (product_id, user_id, rating, comment)

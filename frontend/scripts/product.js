@@ -396,15 +396,6 @@ function initializeProductPage() {
         window.syncProductQtyControls();
     }
 
-    if (
-        typeof loadProductReviews ===
-        "function"
-    ) {
-
-        loadProductReviews(
-            product.id
-        );
-    }
 
     if (
         typeof loadRelatedProducts ===
@@ -890,6 +881,13 @@ document.addEventListener(
     () => {
 
         fetchProduct();
+
+        if (
+            typeof loadProductReviews ===
+            "function"
+        ) {
+            loadProductReviews(productId);
+        }
 
         if (
             typeof updateCartCount ===
