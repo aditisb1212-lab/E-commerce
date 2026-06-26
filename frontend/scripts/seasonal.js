@@ -142,10 +142,10 @@
         const starsHtml = '<i class="fas fa-star"></i>'.repeat(product.rating || 5);
         
         div.innerHTML = `
-            <img src="${product.image || 'assets/images/default.jpg'}" alt="${product.name}" onerror="this.src='assets/images/default.jpg';">
+            <img src="${product.image || 'assets/images/default.jpg'}" alt="${AppUtils.escapeHTML(product.name)}" onerror="this.src='assets/images/default.jpg';">
             <div class="des">
-                <span>${product.brand || 'Adidas'}</span>
-                <h5>${product.name}</h5>
+                <span>${AppUtils.escapeHTML(product.brand || 'Adidas')}</span>
+                <h5>${AppUtils.escapeHTML(product.name)}</h5>
                 <div class="star">
                     ${starsHtml}
                 </div>
