@@ -185,7 +185,7 @@ const signup = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
         pendingSignups.set(cleanEmail, {
             name: cleanName,
-            password: hashedPassword,
+            hashedPassword,
             userId: token.userId,
             expiresAt: Date.now() + OTP_EXPIRY_MINUTES * 60 * 1000
         });
@@ -262,7 +262,7 @@ const verifySignup = async (req, res) => {
         // Save to MySQL with email_verified flag
         await db.query(
             `INSERT INTO users (name, email, password, role, email_verified) VALUES (?, ?, ?, ?, ?)`,
-            [pendingUser.name, cleanEmail, pendingUser.password, "user", 1]
+            [pendingUser.name, cleanEmail, pendingUser.hashedPassword, "user", 1]
         );
 
         // Cleanup Appwrite session
