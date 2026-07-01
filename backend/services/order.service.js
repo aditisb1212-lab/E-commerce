@@ -3,7 +3,7 @@ const {
     safeArray,
     safeNumber,
     safeInteger,
-    sanitizeString
+    sanitizeString,
 } = require("../utils/helpers");
 
 const { validatePromo, calculateDiscount } = require("./promo.service");
@@ -11,16 +11,28 @@ const { validatePromo, calculateDiscount } = require("./promo.service");
 // create order service
 const createOrderService = async (connection, orderData) => {
     try {
-        const { user_id, customer_name, customer_email, customer_phone, city, state, zip, full_address, payment_method, items, promo_code } = orderData;
-        
+        const {
+            user_id,
+            customer_name,
+            customer_email,
+            customer_phone,
+            city,
+            state,
+            zip,
+            full_address,
+            payment_method,
+            items,
+            promo_code,
+        } = orderData;
+
         // validated items
         const validatedItems = [];
-        
+
         // validate empty cart
         if (!safeArray(items).length) {
             throw new Error("Cart is empty");
         }
-        
+
         // secure total
         let calculatedTotal = 0;
 
@@ -33,19 +45,12 @@ const createOrderService = async (connection, orderData) => {
                 throw new Error("Invalid product ID");
             }
 
-            const productQuery = `
-                SELECT
-                    id,
-                    name,
-                    price,
-                    stock,
-                    image
-                FROM products
-                WHERE id = ?
-                LIMIT 1
-            `;
+            const productQuery = `SELECT id, name, price, stock, image FROM products WHERE id = ?
+            LIMIT 1 FOR UPDATE `;
 
-            const [productResults] = await connection.query(productQuery, [productId]);
+            const [productResults] = await connection.query(productQuery, [
+                productId,
+            ]);
             const safeResults = safeArray(productResults);
 
             // product missing
@@ -58,7 +63,9 @@ const createOrderService = async (connection, orderData) => {
 
             // stock validation
             if (safeInteger(product.stock) < qty) {
-                throw new Error(`Insufficient stock for ${sanitizeString(product.name)}`);
+                throw new Error(
+                    `Insufficient stock for ${sanitizeString(product.name)}`,
+                );
             }
 
             // safe db price
@@ -76,7 +83,7 @@ const createOrderService = async (connection, orderData) => {
                 price: realPrice,
                 qty,
                 color: sanitizeString(item.color),
-                size: sanitizeString(item.size)
+                size: sanitizeString(item.size),
             });
         }
 
@@ -90,7 +97,10 @@ const createOrderService = async (connection, orderData) => {
             if (!promoValidation.valid) {
                 throw new Error(`Promo Code Error: ${promoValidation.message}`);
             }
-            discountAmount = calculateDiscount(promoValidation.promo, calculatedTotal);
+            discountAmount = calculateDiscount(
+                promoValidation.promo,
+                calculatedTotal,
+            );
             finalAmount = Number((calculatedTotal - discountAmount).toFixed(2));
             appliedPromoCode = promoValidation.promo.code;
         }
@@ -132,7 +142,7 @@ const createOrderService = async (connection, orderData) => {
             calculatedTotal,
             appliedPromoCode,
             discountAmount,
-            finalAmount
+            finalAmount,
         ]);
 
         const orderId = orderResult.insertId;
@@ -157,18 +167,29 @@ const createOrderService = async (connection, orderData) => {
                 item.price,
                 item.qty,
                 item.color,
-                item.size
+                item.size,
             ]);
         }
 
-        // reduce stock
+        // reduce stock safely
         for (const item of validatedItems) {
-            const stockQuery = `
-                UPDATE products
-                SET stock = stock - ?
-                WHERE id = ?
-            `;
-            await connection.query(stockQuery, [item.qty, item.id]);
+            const stockQuery = `UPDATE products SET stock = stock - ? WHERE id = ? 
+            AND stock >= ? `;
+
+            const [result] = await connection.query(
+                stockQuery,
+                [
+                    item.qty,
+                    item.id,
+                    item.qty
+                ]
+            );
+
+            if (result.affectedRows === 0) {
+                throw new Error(
+                    `Insufficient stock for ${item.name}`
+                );
+            }
         }
 
         // record purchase interaction
@@ -178,7 +199,11 @@ const createOrderService = async (connection, orderData) => {
                     INSERT INTO user_interactions (user_id, product_id, interaction_type)
                     VALUES (?, ?, ?)
                 `;
-                await connection.query(interactionQuery, [user_id, item.id, 'purchase']);
+                await connection.query(interactionQuery, [
+                    user_id,
+                    item.id,
+                    "purchase",
+                ]);
             }
         }
 
@@ -188,9 +213,8 @@ const createOrderService = async (connection, orderData) => {
             success: true,
             orderId: orderResult.insertId,
             total: calculatedTotal,
-            items: validatedItems
+            items: validatedItems,
         };
-
     } catch (error) {
         await connection.rollback();
         throw error;
@@ -210,5 +234,5 @@ const getOrdersService = async () => {
 
 module.exports = {
     createOrderService,
-    getOrdersService
+    getOrdersService,
 };
