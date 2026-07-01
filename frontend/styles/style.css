@@ -277,5 +277,42 @@
     min-height: 20px;
 }
 
+#password-strength-bar {
+    height: 6px;
+    border-radius: 4px;
+    background: #e0e0e0;
+    overflow: hidden;
+}
+
+#password-strength-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.4s ease, background-color 0.4s ease;
+}
+
+#password-strength-fill.strength-weak {
+    background-color: #e74c3c;
+}
+
+#password-strength-fill.strength-medium {
+    background-color: #f39c12;
+}
+
+#password-strength-fill.strength-strong {
+    background-color: #27ae60;
+}
+
+#password-strength-text.strength-weak {
+    color: #e74c3c !important;
+}
+
+#password-strength-text.strength-medium {
+    color: #f39c12 !important;
+}
+
+#password-strength-text.strength-strong {
+    color: #27ae60 !important;
+}
+
 /* =============================
 Breadcrumb Navigation (Issue #344)
