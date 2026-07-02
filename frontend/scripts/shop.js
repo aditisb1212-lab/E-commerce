@@ -674,6 +674,18 @@ function applySorting() {
         );
     }
 
+    if (sortValue === "newest") {
+        sortedProducts.sort((a, b) => {
+            return Number(b.id || 0) - Number(a.id || 0);
+        });
+    }
+
+    if (sortValue === "oldest") {
+        sortedProducts.sort((a, b) => {
+            return Number(a.id || 0) - Number(b.id || 0);
+        });
+    }
+
     renderProducts(
         sortedProducts
     );
