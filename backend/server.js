@@ -17,6 +17,11 @@ const routes = require("./routes/index");
 const authLimiter = require("./middleware/authLimiter");
 const mcpRoutes = require("./routes/mcpRoutes"); // ✅ MCP Routes added
 
+// Add with other route imports
+const aiRoutes = require('./routes/aiRoutes');
+
+// Add AI routes
+app.use('/api/ai', aiRoutes);
 // load environment
 dotenv.config();
 const { validateEnv } = require('./config/envValidator');
