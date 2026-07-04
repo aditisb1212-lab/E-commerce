@@ -276,10 +276,10 @@ async function toggleProductWishlist() {
                     )
             );
 
-        AppUtils.notify(
-            "Removed from wishlist",
-            "info"
-        );
+       AppUtils.notify(
+           "Added to wishlist ❤️",
+            "success"
+                    );
         
         if (token) {
             try {
